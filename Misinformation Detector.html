@@ -1,1 +1,186 @@
+// AI‑Powered Misinformation Detection & Education — Advanced Prototype
+// File: ai_misinformation_tool_prototype.jsx
+// Default export: React component
+// Description: React + Tailwind prototype demonstrating advanced features:
+//  - Deepfake Radar: detect manipulated images/videos (placeholder)
+//  - AI FactShield: cross-check factual accuracy (placeholder)
+//  - Narrative Detector: detect biased/one-sided narratives
+//  - AI MythBuster: debunk common myths with fact databases
+//  - Truth Lens: explainable AI transparency layer
+//  - Multilingual Support: English, Hindi, Tamil, etc. (placeholder for translation/detection)
+//  - Community Validation: upvotes/downvotes teach model from feedback
+//  - Emergency Mode: faster scanning during elections/pandemics
+//  - Real-time usage: placeholder for WebSocket/streaming updates
+
+import React, { useState, useEffect } from "react";
+
+// Mocked multilingual detection
+function detectLanguage(text) {
+  const hindiChars = /[\u0900-\u097F]/;
+  const tamilChars = /[\u0B80-\u0BFF]/;
+  if (hindiChars.test(text)) return "Hindi";
+  if (tamilChars.test(text)) return "Tamil";
+  return "English";
+}
+
+// Placeholder deepfake detector
+function deepfakeRadar(content) {
+  return content.includes("video") ? 0.3 : 0.9; // lower score if suspicious
+}
+
+// Placeholder narrative detector
+function narrativeDetector(text) {
+  const biasWords = ["always", "never", "everyone", "no one"];
+  let count = 0;
+  for (let w of biasWords) if (text.toLowerCase().includes(w)) count++;
+  return count > 0 ? "Possible biased narrative detected" : "Neutral narrative";
+}
+
+// Placeholder AI MythBuster
+function aiMythbuster(text) {
+  const myths = {
+    "5g causes covid": "No, multiple studies show no link between 5G and COVID-19.",
+    "garlic cures cancer": "No scientific evidence supports garlic curing cancer.",
+  };
+  for (const myth in myths) if (text.toLowerCase().includes(myth)) return myths[myth];
+  return null;
+}
+
+// Placeholder FactShield
+function factShield(text) {
+  if (text.toLowerCase().includes("earth is flat")) return "Scientific consensus confirms Earth is round.";
+  return null;
+}
+
+// Main analyzer (combines multiple detectors)
+async function analyzeContent({ url, text }) {
+  const language = detectLanguage(text);
+  const deepfakeScore = deepfakeRadar(text);
+  const narrative = narrativeDetector(text);
+  const mythResult = aiMythbuster(text);
+  const factResult = factShield(text);
+
+  // Simulated credibility score (combine factors)
+  let score = (deepfakeScore + (factResult ? 0.9 : 0.6)) / 2;
+  if (mythResult) score -= 0.3;
+
+  // Suggestions
+  const suggestions = [
+    "Cross-check information on fact-check portals.",
+    "Be cautious of emotionally charged narratives.",
+    "Use multiple language sources if available.",
+    "Check if other citizens rated the content credible.",
+  ];
+
+  return {
+    language,
+    deepfakeScore,
+    narrative,
+    mythResult,
+    factResult,
+    score: Math.max(0, Math.min(1, score)),
+    suggestions,
+  };
+}
+
+export default function AIMisinformationPrototype() {
+  const [inputText, setInputText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [votes, setVotes] = useState({ up: 0, down: 0 });
+  const [emergencyMode, setEmergencyMode] = useState(false);
+
+  async function handleAnalyze(e) {
+    e?.preventDefault();
+    setLoading(true);
+    const analysis = await analyzeContent({ url: null, text: inputText });
+    setResult(analysis);
+    setLoading(false);
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-4">AI FactShield — Advanced Prototype</h1>
+      <textarea
+        value={inputText}
+        onChange={(e) => setInputText(e.target.value)}
+        placeholder="Paste article text here (supports English, Hindi, Tamil)"
+        rows={6}
+        className="p-2 w-full border rounded mb-3"
+      />
+      <button
+        onClick={handleAnalyze}
+        disabled={loading}
+        className="px-4 py-2 rounded bg-sky-600 text-white"
+      >
+        {loading ? "Analyzing..." : "Analyze"}
+      </button>
+
+      <div className="mt-4">
+        <label className="flex items-center gap-2">
+          <input type="checkbox" checked={emergencyMode} onChange={() => setEmergencyMode(!emergencyMode)} />
+          Emergency Mode (faster scanning for elections/pandemics)
+        </label>
+      </div>
+
+      {result && (
+        <div className="mt-6 space-y-4">
+          <div className="p-4 border rounded">
+            <h2 className="font-semibold">Overall Credibility Score</h2>
+            <p className="text-3xl font-bold">{Math.round(result.score * 100)}%</p>
+            <p className="text-sm text-gray-500">Language Detected: {result.language}</p>
+          </div>
+
+          <div className="p-4 border rounded">
+            <h3 className="font-semibold mb-2">Deepfake Radar</h3>
+            <p>Confidence: {Math.round(result.deepfakeScore * 100)}%</p>
+          </div>
+
+          <div className="p-4 border rounded">
+            <h3 className="font-semibold mb-2">Narrative Detector</h3>
+            <p>{result.narrative}</p>
+          </div>
+
+          {result.mythResult && (
+            <div className="p-4 border rounded bg-red-50">
+              <h3 className="font-semibold mb-2">AI MythBuster</h3>
+              <p>{result.mythResult}</p>
+            </div>
+          )}
+
+          {result.factResult && (
+            <div className="p-4 border rounded bg-green-50">
+              <h3 className="font-semibold mb-2">AI FactShield</h3>
+              <p>{result.factResult}</p>
+            </div>
+          )}
+
+          <div className="p-4 border rounded">
+            <h3 className="font-semibold mb-2">Truth Lens (Explainable AI)</h3>
+            <p>This score is based on deepfake radar, fact-checks, myth detection, and narrative bias analysis.</p>
+          </div>
+
+          <div className="p-4 border rounded">
+            <h3 className="font-semibold mb-2">Community Validation</h3>
+            <div className="flex gap-4">
+              <button onClick={() => setVotes(v => ({ ...v, up: v.up + 1 }))} className="px-3 py-1 rounded bg-green-100">👍 {votes.up}</button>
+              <button onClick={() => setVotes(v => ({ ...v, down: v.down + 1 }))} className="px-3 py-1 rounded bg-red-100">👎 {votes.down}</button>
+            </div>
+          </div>
+
+          <div className="p-4 border rounded">
+            <h3 className="font-semibold mb-2">Actionable Suggestions</h3>
+            <ul className="list-disc pl-5 text-sm">
+              {result.suggestions.map((s, i) => <li key={i}>{s}</li>)}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      <footer className="mt-8 text-xs text-gray-500">
+        Prototype — Replace placeholders with real-time AI models, fact-check APIs, and multimedia deepfake detection.
+      </footer>
+    </div>
+  );
+}
 
